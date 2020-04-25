@@ -16,10 +16,15 @@ VEC_2 = constants.VEC_2
 
 
 class Pacman(game_object.GameObject):
-    def __init__(self, game):
+    """
+    Class of the player
+    """
+
+    def __init__(self, game, mixer):
         super().__init__(constants.PACMAN_START_POSITION)
 
         self.game = game
+        self.mixer = mixer
 
         self.g_position = self.position
 
@@ -95,8 +100,9 @@ class Pacman(game_object.GameObject):
         if self.is_helper_activated():
             self.eat_ghost()
         else:
-            if self.count_lifes >= 2:
+            if self.count_lifes >= 1:
                 self.count_lifes -= 1
+                self.mixer.killed_pacman(self.count_lifes)
                 self.respawn()
             else:
                 self.game.game_over = True
@@ -195,8 +201,9 @@ class Pacman(game_object.GameObject):
                 return
 
             with lock:
-                self.helper_time -= 1
-                print(self.helper_time)
+                if not self.game.game_pause:
+                    self.helper_time -= 1
+                    print(self.helper_time)
             time.sleep(1)
 
         for ghost in self.game.movement_objects:

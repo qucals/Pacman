@@ -6,6 +6,7 @@ import label
 import pacman
 import enemy
 import resources
+import music
 
 from collections import defaultdict
 
@@ -22,9 +23,9 @@ SCREEN_HEIGHT = constants.SCREEN_HEIGHT
 VEC_2 = constants.VEC_2
 
 
-class Game(object):
-    def __init__(self, screen):
-        super().__init__()
+class Game:
+    def __init__(self, screen, mixer):
+        self.mixer = mixer
         self.screen = screen
 
         # Current level
@@ -48,6 +49,7 @@ class Game(object):
         self.killed_ghosts = []
 
         self._init_movement_objects()
+        self.mixer.enter_sound()
 
     def run(self):
         if self.game_pause:
@@ -63,20 +65,21 @@ class Game(object):
             self.update()
             self.draw()
 
-            pygame.display.update()
+            if not self.game_over and not self.game_pause:
+                pygame.display.update()
 
             self.clock.tick(constants.FPS)
 
     def check_win(self):
-        if self.scores == 288 and not self.launch_sound:
-            self.launch_sound = True
-            pygame.mixer.music.load(constants.WIN_SOUND_PATH)
-            pygame.mixer.music.play()
+        if self.scores == constants.TRIGGER_WIN_SOUND:
+            self.mixer.secret_sound()
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.quit_game()
+                self.game_over = True
+            if event.type == constants.SONG_END:
+                self.mixer.playing_sound()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     self.pacman.move(VEC_2(
@@ -108,7 +111,7 @@ class Game(object):
         self.game_over = True
 
     def _init_movement_objects(self):
-        self.pacman = pacman.Pacman(self)
+        self.pacman = pacman.Pacman(self, self.mixer)
         self.movement_objects.append(self.pacman)
 
         for index, ghost_name in enumerate(constants.GHOST_NAMES):
@@ -123,16 +126,10 @@ class Game(object):
         self.movement_objects.remove(ghost)
 
     def remove_cherry(self, position):
-        try:
-            self.map_objects['cherries'].remove(position)
-        except Exception:
-            pass
+        self.map_objects['cherries'].remove(position)
 
     def remove_coin(self, position):
-        try:
-            self.map_objects['coins'].remove(position)
-        except Exception:
-            pass
+        self.map_objects['coins'].remove(position)
 
     def is_there_coin(self, position):
         return position in self.map_objects['coins']
@@ -183,7 +180,7 @@ class Game(object):
             helper_time.draw(self.screen)
 
     def _draw_map(self):
-        self.screen.fill([0, 0, 0])
+        self.screen.fill(constants.BACKGROUND_MAP_COLOUR)
         self.screen.blit(self.map_picture, (TOP_BUFFER//2,
                                             TOP_BUFFER//2))
 

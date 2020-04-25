@@ -4,10 +4,13 @@ import constants
 
 
 def __loading_ghosts_pictures():
-    """ 
-        This function is loading ghost pictures from res\ghosts\*
-        To the array 'pictures'
     """
+    Load pictures of ghosts from png files.
+
+    Returns:
+        { { str : pygame.image } } -- The dict of dicts of ghost's pictures
+    """
+
     dict_ghosts_pictures = {}
     postfixes = [
         'down', 'left',
@@ -38,9 +41,11 @@ def __loading_ghosts_pictures():
 
 
 def __loading_pacman_pictures():
-    """ 
-        This function is loading pacman pictures from res\pacman\*
-        To the array 'pictures'
+    """
+    Load pacman's pictures
+
+    Returns:
+        { str : pygame.image } -- The dict of pacman's pictures
     """
 
     name = 'pacman'
@@ -61,9 +66,14 @@ def __loading_pacman_pictures():
 
 
 def __loading_maps_objects(count_maps):
-    """ 
-        This function is loading maps objects from res\maps\*
-        To the dict 'maps_objects'
+    """
+    Load maps' objects from txt files
+
+    Arguments:
+        count_maps { int } -- Count of maps
+
+    Returns:
+        [ {} ] -- The array of dicts' maps
     """
 
     maps_objects = []
@@ -102,6 +112,16 @@ def __loading_maps_objects(count_maps):
 
 
 def loading_map_objects(number):
+    """
+    Load map's objects from txt files
+
+    Arguments:
+        number { int } -- number of the map
+
+    Returns:
+        { [] } -- The dict of arrays of map's objects
+    """
+
     map_objects = {}
     dirpath = os.path.join('res', 'level_walls')
     path = os.path.join(dirpath, 'map_{number}.txt'.format(number=number))
@@ -132,6 +152,13 @@ def loading_map_objects(number):
 
 
 def __loading_maps():
+    """
+    Load maps' pictures
+
+    Returns:
+        [ pygame.image, ... ] -- Array of map's pictures
+    """
+
     maps = []
 
     for map_path in constants.MAPS_PATHS:
@@ -144,6 +171,13 @@ def __loading_maps():
 
 
 def __loading_cherry_picture():
+    """
+    Load the cherry's picture
+
+    Returns:
+        pygame.image -- An image of the cherry
+    """
+
     path_picture = constants.CHERRY_PICTURE_PATH
     got_picture = pygame.image.load(path_picture)
     got_picture = pygame.transform.scale(got_picture,
@@ -151,10 +185,26 @@ def __loading_cherry_picture():
     return got_picture
 
 
+def __loading_background_image_menu():
+    """
+    Load an background image of the menu
+
+    Returns:
+        pygame.image -- An image of the background image
+    """    
+    
+    path_image = constants.IMAGE_MENU_PATH
+    got_image = pygame.image.load(path_image)
+    got_image = pygame.transform.scale(got_image,
+                                       constants.DISPLAY_SIZE)
+    return got_image
+
+
 GHOSTS_PICTURES_LOADED = __loading_ghosts_pictures()
 PACMAN_PICTURES_LOADED = __loading_pacman_pictures()
 MAPS_PICTURES_LOADED = __loading_maps()
 CHERRY_PICTURE_LOADED = __loading_cherry_picture()
+BACKGROUND_IMAGE_MENU_LOADED = __loading_background_image_menu()
 
 # TODO: Create lazy load
 # MAPS_OBJECTS = __loading_maps_objects(constants.COUNT_MAPS)

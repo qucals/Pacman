@@ -3,7 +3,7 @@ import menu
 
 if __name__ == "__main__":
     _menu = menu.Menu()
-
+    
     try:
         _menu.start()
     except Exception as err_msg:

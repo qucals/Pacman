@@ -2,11 +2,17 @@ import pygame
 import constants
 import game
 import label
+import resources
+import music
 
 VEC_2 = constants.VEC_2
 
 
 class Menu:
+    """
+    Class of the menu of the game
+    """
+
     def __init__(self):
         # display constants
         self.size_display = constants.DISPLAY_SIZE
@@ -18,6 +24,7 @@ class Menu:
 
         self.screen = pygame.display.set_mode(self.size_display)
         self.game = None
+        self.quit_station = False
 
         self.current_object = 0
         self.objects = []
@@ -26,13 +33,24 @@ class Menu:
         self.TOP_BUFFER = 200
         self.CENTER_OF_SCREEN = constants.SCREEN_WIDTH//2
 
+        self.background_image = resources.BACKGROUND_IMAGE_MENU_LOADED
+
+        self.mixer = music.Music()
+
     def start(self):
-        while True:
+        """
+        Start working of the menu
+        """
+
+        while not self.quit_station:
+            self.mixer.menu_sound()
+
             self.update()
             self.draw()
             self.handler_events()
 
-            pygame.display.update()
+            if not self.quit_station:
+                pygame.display.update()
 
     def handler_events(self):
         for event in pygame.event.get():
@@ -49,22 +67,55 @@ class Menu:
                 self.quit()
 
     def draw(self):
-        self.screen.fill([0, 0, 0])
+        """
+        Draw all menu's objects
+        """
+
+        self.screen.blit(self.background_image, (0, 0))
         self._draw_text_objects()
 
     def update(self):
+        """
+        Update menu's objects
+        """
         self._update_text_objects()
 
     def run(self):
-        self.restart()
+        """
+        Start playing the game
+        """
+
+        if self.game is None:
+            self.restart()
+        elif not self.game.game_pause:
+            self.restart()
+
         self.game.run()
 
     def quit(self):
+        """
+        Quit from the game
+        """
+
+        self.quit_station = True
         if self.game is not None:
             self.game.quit_game()
         pygame.quit()
 
+    def restart(self):
+        """
+        Restart of game's elements
+        """
+
+        if self.game is not None:
+            del self.game
+        self.game = game.Game(self.screen, self.mixer)
+
     def _define_action(self):
+        """
+        Define the program's action after pressed the button
+        """
+
         text = self.objects[self.current_object].text
 
         if text == 'START':
@@ -106,13 +157,15 @@ class Menu:
         text.draw(self.screen)
 
     def _is_running(self):
+        """
+        Check the game is running
+
+        Returns:
+            bool -- The game station
+        """        
+        
         if self.game is None:
             return False
         elif self.game.game_over:
             return False
         return True
-
-    def restart(self):
-        if self.game is not None:
-            del self.game
-        self.game = game.Game(self.screen)
