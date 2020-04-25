@@ -15,7 +15,7 @@ class Music:
     def enter_sound(self):
         pass
 
-    def killed_pacman(self):
+    def killed_pacman(self, count_lifes):
         pass
 
     def play_sound(self):
